@@ -18,12 +18,13 @@ pipeline {
     stage('Package') {
       steps {
         echo 'Creating package for the app....'
-        bat 'mvn package -DskipTests'
         sh '''#truncate the git_commit to the 7 character
 GIT_SHORT_COMMIT=$(echo $GIT_COMMIT | cut -c 1-7)
 #set the version using maven
 mvn versions:set -DnewVersion="$GIT_SHORT_COMMIT"
 mvn versions:commit'''
+        bat 'mvn package -DskipTests'
+        archiveArtifacts '**/target/*.jar'
       }
     }
 
