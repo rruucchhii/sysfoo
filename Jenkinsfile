@@ -10,7 +10,7 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Compiling sysfoo app..'
-        bat 'mvn compile'
+        sh 'mvn compile'
       }
     }
 
