@@ -4,14 +4,14 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Compiling sysfoo app..'
-        bat 'mvn compile'
+        sh 'mvn compile'
       }
     }
 
     stage('Test') {
       steps {
         echo 'Running Unit Testing..'
-        bat 'mvn clean test'
+        sh 'mvn clean test'
       }
     }
 
@@ -23,7 +23,7 @@ GIT_SHORT_COMMIT=$(echo $GIT_COMMIT | cut -c 1-7)
 #set the version using maven
 mvn versions:set -DnewVersion="$GIT_SHORT_COMMIT"
 mvn versions:commit'''
-        bat 'mvn package -DskipTests'
+        sh 'mvn package -DskipTests'
         archiveArtifacts '**/target/*.jar'
       }
     }
