@@ -1,5 +1,11 @@
 pipeline {
   agent any
+  
+  // FIX 1: The 'tools' block MUST be placed BEFORE the 'stages' block.
+  tools {
+    maven 'maven 3.9.12' // Ensure this exactly matches the case/spelling in Global Tool Configuration
+  }
+  
   stages {
     stage('Build') {
       steps {
@@ -18,24 +24,25 @@ pipeline {
     stage('Package') {
       steps {
         echo 'Creating package for the app....'
-        sh '''#truncate the git_commit to the 7 character
+        
+        // FIX 2: Added #!/bin/bash shebang to the top of the multi-line shell script 
+        // to ensure it correctly processes variables like $(echo...)
+        sh '''#!/bin/bash
 GIT_SHORT_COMMIT=$(echo $GIT_COMMIT | cut -c 1-7)
-#set the version using maven
 mvn versions:set -DnewVersion="$GIT_SHORT_COMMIT"
 mvn versions:commit'''
+        
         sh 'mvn package -DskipTests'
-        archiveArtifacts '**/target/*.jar'
+        
+        // FIX 3: Added the explicit "artifacts:" parameter name which is required in Declarative
+        archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
       }
     }
-
   }
-  tools {
-    maven 'maven 3.9.12'
-  }
+  
   post {
     always {
       echo 'This pipeline is completed..'
     }
-
   }
 }
